@@ -282,6 +282,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function formatSchedule(details) {
     // If schedule_details is available, use the structured data
     if (details.schedule_details) {
+      if (!details.schedule_details.end_time) {
+        return details.schedule;
+      }
+
       const days = details.schedule_details.days.join(", ");
 
       // Convert 24h time format to 12h AM/PM format for display
