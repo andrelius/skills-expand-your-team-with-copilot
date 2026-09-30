@@ -171,6 +171,99 @@ section h3 {
   width: 100%;
 }
 
+/* Calendar view */
+#calendar-view {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, minmax(110px, 1fr));
+  min-width: 850px;
+}
+
+.calendar-corner {
+  position: sticky;
+  top: 0;
+  background-color: var(--surface);
+}
+
+.calendar-day-header {
+  position: sticky;
+  top: 0;
+  background-color: var(--surface);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 6px 4px;
+  border-bottom: 2px solid var(--border);
+  color: var(--primary);
+}
+
+.calendar-time-axis {
+  position: relative;
+}
+
+.calendar-time-label {
+  position: absolute;
+  left: 0;
+  right: 4px;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.calendar-day-column {
+  position: relative;
+  border-left: 1px solid var(--border);
+}
+
+.calendar-hour-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--border-light);
+}
+
+.calendar-day-column .calendar-event {
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 3px 5px;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendar-event-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-event-enrollment {
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-event.tooltip .tooltip-text {
+  bottom: auto;
+  top: 0;
+  left: 100%;
+  transform: none;
+  text-align: left;
+  max-width: 220px;
+}
+
 .activity-card {
   padding: 12px;
   border: 1px solid var(--border);
@@ -681,6 +774,36 @@ footer {
   .sidebar-filters {
     width: 100%;
   }
+}
+
+/* View toggle in header */
+.view-toggle {
+  display: flex;
+  gap: 2px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 2px;
+}
+
+.view-toggle-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: transparent;
+  color: white;
+  border-radius: 18px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+}
+
+.view-toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.view-toggle-button.active {
+  background-color: rgba(255, 255, 255, 0.35);
+  font-weight: bold;
 }
 
 /* User controls in header */
