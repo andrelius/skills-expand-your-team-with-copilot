@@ -510,6 +510,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </span>
     `;
 
+    // Create share buttons so students/teachers can share the activity
+    const shareHtml = createShareButtonsHtml(name, details);
+
     // Create capacity indicator
     const capacityIndicator = `
       <div class="capacity-container ${capacityStatusClass}">
@@ -532,6 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="tooltip-text">Regular meetings at this time throughout the semester</span>
       </p>
       ${capacityIndicator}
+      ${shareHtml}
       <div class="participants-list">
         <h5>Current Participants:</h5>
         <ul>
@@ -575,6 +579,12 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", () => handleShareClick(button, name));
+    });
+
     // Add click handlers for delete buttons
     const deleteButtons = activityCard.querySelectorAll(".delete-participant");
     deleteButtons.forEach((button) => {
@@ -592,6 +602,134 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     activitiesList.appendChild(activityCard);
+  }
+
+  // Build the shareable URL and text for a given activity
+  function getShareDetails(name, details) {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(
+      name
+    )}`;
+    const shareText = `Check out "${name}" at Mergington High School: ${details.description}`;
+    return { shareUrl, shareText };
+  }
+
+  // Create the HTML markup for the share buttons on an activity card
+  function createShareButtonsHtml(name, details) {
+    return `
+      <div class="share-container">
+        <span class="share-label">Share:</span>
+        <div class="share-buttons">
+          <button
+            type="button"
+            class="share-button share-twitter"
+            data-network="twitter"
+            title="Share on X (Twitter)"
+            aria-label="Share on X (Twitter)"
+          >𝕏</button>
+          <button
+            type="button"
+            class="share-button share-facebook"
+            data-network="facebook"
+            title="Share on Facebook"
+            aria-label="Share on Facebook"
+          >📘</button>
+          <button
+            type="button"
+            class="share-button share-whatsapp"
+            data-network="whatsapp"
+            title="Share on WhatsApp"
+            aria-label="Share on WhatsApp"
+          >💬</button>
+          <button
+            type="button"
+            class="share-button share-email"
+            data-network="email"
+            title="Share by Email"
+            aria-label="Share by Email"
+          >✉️</button>
+          <button
+            type="button"
+            class="share-button share-copy"
+            data-network="copy"
+            title="Copy Link"
+            aria-label="Copy Link"
+          >🔗</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Handle a click on any of the share buttons for an activity
+  function handleShareClick(button, name) {
+    const details = allActivities[name];
+    if (!details) {
+      return;
+    }
+
+    const network = button.dataset.network;
+    const { shareUrl, shareText } = getShareDetails(name, details);
+
+    let shareLink = "";
+    switch (network) {
+      case "twitter":
+        shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          shareText
+        )}&url=${encodeURIComponent(shareUrl)}`;
+        break;
+      case "facebook":
+        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          shareUrl
+        )}`;
+        break;
+      case "whatsapp":
+        shareLink = `https://wa.me/?text=${encodeURIComponent(
+          `${shareText} ${shareUrl}`
+        )}`;
+        break;
+      case "email":
+        shareLink = `mailto:?subject=${encodeURIComponent(
+          `Join me for ${name}!`
+        )}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
+        break;
+      case "copy":
+        copyShareLink(shareUrl);
+        return;
+      default:
+        return;
+    }
+
+    window.open(shareLink, "_blank", "noopener,noreferrer");
+  }
+
+  // Copy the share link to the clipboard and let the user know it worked
+  function copyShareLink(shareUrl) {
+    const fallbackCopy = () => {
+      const textarea = document.createElement("textarea");
+      textarea.value = shareUrl;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        showMessage("Activity link copied to clipboard!", "success");
+      } catch (error) {
+        showMessage("Unable to copy link. Please copy it manually.", "error");
+      }
+      document.body.removeChild(textarea);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => {
+          showMessage("Activity link copied to clipboard!", "success");
+        })
+        .catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
   }
 
   // Event listeners for search and filter
